@@ -27,7 +27,7 @@ const serviceAccountAuth = new JWT({
 // Function to access Google Spreadsheet data
 async function accessSpreadsheet() {
     try {
-        const doc = new GoogleSpreadsheet("11u1WAtPnyHL05Q1ofu5YIIzCRJaS2a42i8jSC6Ib6C4", serviceAccountAuth);
+        const doc = new GoogleSpreadsheet(creds.Sheet_ID, serviceAccountAuth);
         await doc.loadInfo();
 
         const sheet = doc.sheetsByIndex[0];
@@ -95,7 +95,7 @@ app.post('/addRow', async (req, res) => {
             },
         ];
 
-        const doc = new GoogleSpreadsheet("11u1WAtPnyHL05Q1ofu5YIIzCRJaS2a42i8jSC6Ib6C4", serviceAccountAuth);
+        const doc = new GoogleSpreadsheet(creds.Sheet_ID, serviceAccountAuth);
         await doc.loadInfo();
 
         const sheet = doc.sheetsByIndex[0];
