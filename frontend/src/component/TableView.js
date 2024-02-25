@@ -1,4 +1,5 @@
 import {
+    // Chakra UI components
     Table,
     Thead,
     Tbody,
@@ -26,10 +27,12 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
 } from '@chakra-ui/react';
+
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 function TableComponent() {
+    // State variables
     const [tableHeaders, setTableHeaders] = useState([]);
     const [tableRows, setTableRows] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -38,6 +41,7 @@ function TableComponent() {
     const [isSyncing, setSyncing] = useState(false);
     const [isSaving, setSaving] = useState(false);
 
+    // Function to fetch data from the server
     const fetchData = async () => {
         try {
             setSyncing(true);
@@ -54,12 +58,12 @@ function TableComponent() {
             setTableHeaders(headers);
             setTableRows(rows);
             setSyncing(false);
-            // console.log('API Response:', response);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
 
+    // Function to handle posting data to the server
     const handlePostData = async () => {
         try {
             if (avatarName !== '') {
@@ -69,7 +73,7 @@ function TableComponent() {
                     performanceScore,
                 });
 
-                  console.log('Response:', response.data);
+                console.log('Response:', response.data);
                 fetchData();
                 onClose();
                 setSaving(false);
@@ -79,33 +83,40 @@ function TableComponent() {
         }
     };
 
-
+    // Event handler for adding a new row
     const handleAddRow = () => {
         handlePostData();
-    }
+    };
+
+    // Event handler for sync button click
     const handleButtonClick = () => {
-        // console.log('Syncing...');
         fetchData();
     };
 
+    // useEffect to fetch data on component mount
     useEffect(() => {
         fetchData();
     }, []);
 
+    // Event handler for avatar name input change
     const handleAvatarNameChange = (e) => {
         setAvatarName(e.target.value);
-    }
+    };
 
+    // Event handler for performance score input change
     const handlePerformanceScoreChange = (value) => {
         setPerformanceScore(value);
-    }
+    };
 
     return (
         <>
+            {/* Header */}
             <Box w="80%" textAlign="center" m="auto">
                 <Text mt="30px" fontSize="40px" fontWeight="bold">Wherehouse.io</Text>
                 <Text fontSize="20px" fontWeight="bold">Internship Assignment - SDE FullStack</Text>
             </Box>
+
+            {/* Table and Buttons */}
             <TableContainer w="80%" m="auto" mt="20px" border="2px solid #E2E8F0" borderRadius="4px">
                 <Table variant="simple" size="sm">
                     <Thead>
@@ -117,20 +128,22 @@ function TableComponent() {
                     </Thead>
                     <Tbody>{tableRows}</Tbody>
                 </Table>
+
+                {/* Action Buttons */}
                 <Box display="flex" justifyContent="center">
-                    <Button colorScheme="teal" onClick={handleButtonClick} m="10px" px="30px" isLoading = {isSyncing}>
+                    <Button colorScheme="teal" onClick={handleButtonClick} m="10px" px="30px" isLoading={isSyncing}>
                         Sync
                     </Button>
                     <Button onClick={onOpen} colorScheme="teal" m="10px" px="30px">Add Row</Button>
-                    <Modal
-                        isOpen={isOpen}
-                        onClose={onClose}
-                    >
+
+                    {/* Modal for adding a new row */}
+                    <Modal isOpen={isOpen} onClose={onClose}>
                         <ModalOverlay />
                         <ModalContent>
                             <ModalHeader>Add New Entry</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody pb={6}>
+                                {/* Form for Avatar Name and Performance Score */}
                                 <FormControl isRequired>
                                     <FormLabel>Avatar Name</FormLabel>
                                     <Input placeholder='Avatar Name' value={avatarName} onChange={handleAvatarNameChange} />
@@ -148,8 +161,9 @@ function TableComponent() {
                                 </FormControl>
                             </ModalBody>
 
+                            {/* Modal Footer with Save and Cancel buttons */}
                             <ModalFooter>
-                                <Button colorScheme='teal' mr={3} onClick={handleAddRow} isLoading ={isSaving}>
+                                <Button colorScheme='teal' mr={3} onClick={handleAddRow} isLoading={isSaving}>
                                     Save
                                 </Button>
                                 <Button onClick={onClose}>Cancel</Button>
