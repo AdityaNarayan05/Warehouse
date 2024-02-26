@@ -1,24 +1,24 @@
-// Importing necessary modules
 const express = require('express');
-const bodyParser = require('body-parser');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const path = require('path');
+// const creds = require('./secret-key.json');
 
-// Loading service account credentials
-const creds = require('./secret-key.json');
-
-// Configuring Express app
 const app = express();
 const port = 5000;
 
-// Middleware for parsing JSON-encoded bodies
+// Support JSON-encoded bodies
 app.use(bodyParser.json());
 app.use(express.json());
 
-// Creating JWT instance for Google Sheets API authentication
+dotenv.config();
+
+// Create JWT instance for Google Sheets API authentication
 const serviceAccountAuth = new JWT({
-    email: creds.client_email,
-    key: creds.private_key,
+    email: process.env.CLIENT_EMAIL,
+    key: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
     scopes: [
         'https://www.googleapis.com/auth/spreadsheets',
     ],
@@ -27,7 +27,7 @@ const serviceAccountAuth = new JWT({
 // Function to access Google Spreadsheet data
 async function accessSpreadsheet() {
     try {
-        const doc = new GoogleSpreadsheet(creds.Sheet_ID, serviceAccountAuth);
+        const doc = new GoogleSpreadsheet("11u1WAtPnyHL05Q1ofu5YIIzCRJaS2a42i8jSC6Ib6C4", serviceAccountAuth);
         await doc.loadInfo();
 
         const sheet = doc.sheetsByIndex[0];
@@ -59,6 +59,7 @@ async function accessSpreadsheet() {
     }
 }
 
+
 // Endpoint to get data from the spreadsheet
 app.get("/sheet", async (req, res) => {
     try {
@@ -74,12 +75,14 @@ app.get("/sheet", async (req, res) => {
     }
 });
 
+
+
 // Endpoint to add a new row to the spreadsheet
 app.post('/addRow', async (req, res) => {
     try {
         const { avatarName, performanceScore } = req.body;
-
         console.log('Received data:', { avatarName, performanceScore });
+
         const rows = await accessSpreadsheet();
         const lastItem = JSON.parse(rows).slice(-1)[0];
         const header = JSON.parse(rows)[0];
@@ -95,7 +98,7 @@ app.post('/addRow', async (req, res) => {
             },
         ];
 
-        const doc = new GoogleSpreadsheet(creds.Sheet_ID, serviceAccountAuth);
+        const doc = new GoogleSpreadsheet("11u1WAtPnyHL05Q1ofu5YIIzCRJaS2a42i8jSC6Ib6C4", serviceAccountAuth);
         await doc.loadInfo();
 
         const sheet = doc.sheetsByIndex[0];
@@ -108,7 +111,27 @@ app.post('/addRow', async (req, res) => {
     }
 });
 
-// Starting the server
+// -----------------------Deployment-------------------------
+
+const __dirname1 = path.resolve();
+console.log(__dirname1);
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname1,"frontend","build","index.html"));
+    });
+} else {
+    app.get("/", (req, res) => {
+        res.send("It is working");
+    });
+}
+
+// -----------------------Deployment-------------------------
+
+
+
+// Start the server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

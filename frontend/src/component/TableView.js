@@ -47,7 +47,13 @@ function TableComponent() {
             setSyncing(true);
             const response = await axios.get('/sheet');
             const headers = response.data[0].rowData;
-            const rows = response.data.slice(1).map((row) => (
+            // console.log(headers);
+            // console.log("headers");
+            // console.log(response);
+            const hello = response.data.slice(1);
+            // console.log(typeof(hello));
+            // console.log(hello);
+            const rows = hello.map((row) => (
                 <Tr key={row.rowNumber}>
                     {row.rowData.map((cell, index) => (
                         <Td key={index}>{cell}</Td>
